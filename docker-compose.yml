@@ -1,0 +1,50 @@
+version: '3.1'
+
+services:
+  wordpress:
+    container_name: wordpress
+    image: wordpress
+    restart: always
+    ports:
+      - 8888:80
+      - 443:443
+    environment:
+      WORDPRESS_DB_HOST: database
+      WORDPRESS_DB_USER: user
+      WORDPRESS_DB_PASSWORD: secret
+      WORDPRESS_DB_NAME: wpdb
+    volumes:
+      - ./wordpress:/var/www/html
+    networks:
+      - wp-back
+
+  database:
+    container_name: mysql
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: wpdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - ./db:/var/lib/mysql
+    networks:
+      - wp-back
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    restart: always
+    environment:
+      ADMINER_DEFAULT_DB_DRIVER: mysql
+      ADMINER_DEFAULT_DB_HOST: database
+      ADMINER_DESIGN: haeckel
+      ADMINER_PLUGINS: tables-filter tinymce
+    ports:
+      - 3306:8080
+    networks:
+      - wp-back    
+
+networks:
+  wp-back:
